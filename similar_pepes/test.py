@@ -1,29 +1,28 @@
-#https://github.com/cw-somil/Duplicate-Remover/blob/master/DuplicateRemover.py
+
 import os
-import imagehash
-from PIL import Image
-import numpy as np
 
-location_other_imgs = os.getcwd() + '/images'
-location1_image = os.getcwd() + '/smug.jpg'
+pepe_dir = os.getcwd().split('/')[:-1]
+pepe_dir.append('pepes')
+pepe_dir = "/".join(pepe_dir) + '/'
 
-print(location_other_imgs)
-print(location1_image)
+def get_list_of_files(dir):
+    '''https://thispointer.com/python-how-to-get-list-of-files-in-directory-and-sub-directories/'''
+    # create a list of file and sub directories 
+    # names in the given directory 
+    list_of_files = os.listdir(dir)
+    all_files = list()
+    # Iterate over all the entries
+    for entry in list_of_files:
+        # Create full path
+        full_path = os.path.join(dir, entry)
+        # If entry is a directory then get the list of files in this directory 
+        if os.path.isdir(full_path):
+            all_files = all_files + get_list_of_files(full_path)
+        else:
+            all_files.append(full_path)
+                
+    return all_files
 
-hash_size = 8
-similarity = 85
+print(
+    get_list_of_files(pepe_dir))
 
-fnames = os.listdir(
-    os.getcwd() + '/images')
-threshold = 1 - similarity / 100
-diff_limit = int(threshold*(hash_size**2))
-
-with Image.open(location1_image) as img:
-    hash1 = imagehash.average_hash(img, hash_size).hash
-
-for image in fnames:
-    with Image.open(os.path.join(location_other_imgs,image)) as img:
-        hash2 = imagehash.average_hash(img, hash_size).hash
-        
-        if np.count_nonzero(hash1 != hash2) <= diff_limit:
-            print("{} image found {}% similar to {}".format(image,similarity,location1_image))
