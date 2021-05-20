@@ -9,6 +9,8 @@ __email__ = "pozniakovui@gmail.com"
 import os
 from PIL import Image
 import imagehash
+import numpy as np
+import itertools
 
 def get_list_of_files(dir):
     '''https://thispointer.com/python-how-to-get-list-of-files-in-directory-and-sub-directories/'''
@@ -54,7 +56,33 @@ class PepeImagePolice:
         if len(duplicates):
             if delete:
                 for duplicate in duplicates:                
-                    os.remove(os.path.join(duplicate))
+                    os.remove(duplicate)
+
+    def find_similar(self, similarity=95, delete=False):
+        
+        images = get_list_of_files(self.images_dir)
+        threshold = 1 - similarity/100
+        diff_limit = int(threshold*(self.hash_size**2))
+
+        image_combinations = list(
+            itertools.combinations(
+                images, 2
+            )
+        )
+
+        for image_combo in image_combinations:
+        
+            with Image.open(image_combo[0]) as img:
+                hash1 = imagehash.average_hash(img, self.hash_size).hash
+        
+            with Image.open(image_combo[1]) as img:
+                hash2 = imagehash.average_hash(img, self.hash_size).hash
+                
+                if np.count_nonzero(hash1 != hash2) <= diff_limit:
+                    print("{} image found {}% similar to {}".format(
+                        image_combo[0],similarity,image_combo[1])
+                    )
+        
 
 
         

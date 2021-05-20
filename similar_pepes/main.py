@@ -12,9 +12,10 @@ pepe_dir.append('pepes')
 pepe_dir = "/".join(pepe_dir) + '/'
 
 police = PepeImagePolice.PepeImagePolice(
-    images_dir=pepe_dir
+    images_dir=pepe_dir,
+    hash_size=30
 )
 
-police.find_duplicates(
-    delete=True
+police.find_similar(
+    delete=False,
 )
